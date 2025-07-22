@@ -40,6 +40,7 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchAnalytics = async () => {
+    // Don't set loading to true on subsequent fetches for a smoother refresh
     try {
       const response = await fetch('/api/analytics');
       if (!response.ok) {
@@ -50,12 +51,14 @@ export default function AdminDashboardPage() {
     } catch (err: any) {
       setError(err.message);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Only set loading to false on the initial load
     }
   };
 
   useEffect(() => {
-    fetchAnalytics();
+    fetchAnalytics(); // Fetch immediately on mount
+    const interval = setInterval(fetchAnalytics, 10000); // Then poll every 10 seconds
+    return () => clearInterval(interval); // Cleanup on unmount
   }, []);
 
   const handleLogout = () => {
